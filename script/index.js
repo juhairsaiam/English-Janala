@@ -1,9 +1,25 @@
 // loading the buttons from the api
+const createElement = (arr)=>{
+    const htmlElement = arr.map((el)=>`<span class="btn">${el}</span>`)
+return htmlElement.join(" ")}
+
+const mangeSpinner = (status)=>{
+    if(status == true){
+        document.getElementById("spinner").classList.remove("hidden")
+        document.getElementById("wordsDiv").classList.add("hidden")
+    }
+    else{
+         document.getElementById("wordsDiv").classList.remove("hidden")
+        document.getElementById("spinner").classList.add("hidden")
+    }
+}
+
 const lessons = ()=>{
     fetch("https://openapi.programming-hero.com/api/levels/all")
     .then(res => res.json())
     .then(json => displayLesson(json.data))
 }
+
 const removeActive = ()=> {
     const lessonButtons = document.querySelectorAll(".lesson-btn")
     lessonButtons.forEach(btn => {
@@ -12,6 +28,7 @@ const removeActive = ()=> {
 }
 // loading words from the api 
 const loadLevelWord =(id)=>{
+    mangeSpinner(true);
     const url = `https://openapi.programming-hero.com/api/level/${id}`
     fetch(url)
     .then(res => res.json())
@@ -38,37 +55,35 @@ const displayLesson = (data)=> {
         lessonsDiv.appendChild(div)
     }
 }
-// load Word Details
+// load Word Details 
 const loadWordDetail=async(id)=>{
     const url = `https://openapi.programming-hero.com/api/word/${id}`
     const res = await fetch(url);
     const details = await res.json();
-    displayWordsDetails (details.data)
+    displayWordDetails(details.data);
 }
-// display word details
-const displayWordsDetails = (words) =>{
-    const detailsBox = document.getElementById("details-container");
-    detailsBox.innerHTML = `<div>
-    <p>Eager (   :ইগার)</p>
+const displayWordDetails = (words)=>{
+    console.log(words);
+    const detailsBox = document.getElementById("detail-container");
+    detailsBox.innerHTML =`<div class="space-y-5">
+    <div>
+    <p class="font-bold">Eager (<i class="fa-solid fa-microphone"></i>   :${words.word})</p>
   </div>
   <div>
-    <p>Meaning</p>
-    <p>আগ্রহী</p>
+    <p class="font-bold">Meaning</p>
+    <p>${words.meaning}</p>
   </div>
   <div>
-    <p>Example</p>
-    <p>The kids were eager to open their gifts.</p>
+    <p class="font-bold">Example</p>
+    <p>${words.sentence}</p>
   </div>
-  <div>
-    <p class="bg-[#D7E4EF] ">সমার্থক শব্দ গুলো</p>
-    <p class="bg-[#D7E4EF]"></p>
-    <p class="bg-[#D7E4EF]"></p>
-    <p class="bg-[#D7E4EF]"></p>
-  </div>
-  <button>Complete Learning</button>`
-    document.getElementById("my_modal").showModal(); 
+  <div class="space-y-2">
+    <p class="font-bold">সমার্থক শব্দ গুলো</p>
+    <div>${createElement(words.synonyms)}
+    </div>`;
+        document.getElementById("my_modal").showModal()
 }
-// // load lesson words
+
 const loadWords = (data)=>{
 const wordsDiv = document.getElementById('wordsDiv')
 wordsDiv.innerHTML ='';
@@ -80,7 +95,8 @@ if(data.length === 0){
   <p class="font-bold text-2xl">একটি Lesson Select করুন।</p>
 </div>
         `
-    return;
+        mangeSpinner(false)
+        return;
 }
  data.forEach(element => {
      const div = document.createElement("div")
@@ -90,11 +106,12 @@ if(data.length === 0){
       <p>Meaning /Pronounciation</p>
       <p class ="font-semibold text-2xl">${element.meaning? element.meaning : 'no meaning found'} / ${element.pronunciation ? element.pronunciation : 'pronunciation not found'}</p>
       <div class="flex justify-between">
-       <div onclick="loadWordDetail(${element.id})" class="bg-[#c4cce7] p-2 rounded-md"> <i class="fa-solid fa-circle-info"></i></div>
+       <div  onclick="loadWordDetail(${element.id})" class="bg-[#c4cce7] p-2 rounded-md"> <i class="fa-solid fa-circle-info"></i></div>
        <div class="bg-[#cad1ea] p-2 rounded-md"><i class="fa-solid fa-volume-high"></i></div>  
        </div>
     `
     wordsDiv.appendChild(div);
+    mangeSpinner(false)
  });
 }
 lessons()
