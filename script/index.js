@@ -26,6 +26,7 @@ const removeActive = ()=> {
         btn.classList.remove("active")
     })
 }
+
 // loading words from the api 
 const loadLevelWord =(id)=>{
     mangeSpinner(true);
@@ -115,3 +116,18 @@ if(data.length === 0){
  });
 }
 lessons()
+
+document.getElementById("btn-search").addEventListener("click", ()=>{
+    const input = document.getElementById("input-search");
+    const searchValue = input.value.trim().toLowerCase();
+    console.log(searchValue);
+
+    fetch("https://openapi.programming-hero.com/api/words/all")
+    .then(res=>res.json())
+    .then(data=>{
+        const allWords = data.data;
+        const filterWords = allWords.filter((words)=>
+        words.word.toLowerCase().includes(searchValue));
+        loadWords(filterWords)
+    })
+})
